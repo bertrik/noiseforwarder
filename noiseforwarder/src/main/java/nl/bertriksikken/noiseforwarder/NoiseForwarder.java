@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -14,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
+import nl.bertriksikken.noiseforwarder.noise.NoiseMessage;
+import nl.bertriksikken.noiseforwarder.noise.NoiseParseException;
 import nl.bertriksikken.noiseforwarder.senscom.SensComConfig;
 import nl.bertriksikken.noiseforwarder.senscom.SensComUploader;
 import nl.bertriksikken.noiseforwarder.ttn.MqttListener;
@@ -31,6 +36,7 @@ public final class NoiseForwarder {
 
     private final List<MqttListener> mqttListeners = new ArrayList<>();
     private final SensComUploader sensComUploader;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public static void main(String[] args) throws IOException, MqttException {
         PropertyConfigurator.configure("log4j.properties");
@@ -49,7 +55,7 @@ public final class NoiseForwarder {
         for (TtnAppConfig appConfig : config.getTtnConfig().getApps()) {
             // add listener for each app
             LOG.info("Adding MQTT listener for TTN application '{}'", appConfig.getName());
-            MqttListener listener = new MqttListener(ttnConfig, appConfig, uplink -> messageReceived(uplink));
+            MqttListener listener = new MqttListener(ttnConfig, appConfig, this::messageReceived);
             mqttListeners.add(listener);
         }
     }
@@ -85,20 +91,43 @@ public final class NoiseForwarder {
 
     /**
      * Stops the application.
-     * 
-     * @throws MqttException
      */
     private void stop() {
         LOG.info("Stopping noiseforwarder application");
 
+        executor.shutdown();
         mqttListeners.forEach(MqttListener::stop);
         sensComUploader.stop();
-
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOG.error("Termination interrupted: {}", e.getMessage());
+        }
+            
         LOG.info("Stopped noiseforwarder application");
     }
 
     private void messageReceived(TtnUplinkMessage uplink) {
-        // TODO Auto-generated method stub
+        try {
+            switch (uplink.getPort()) {
+            case 21:
+                String devEui = uplink.getDevEui();
+                NoiseMessage noiseMessage = NoiseMessage.parse(uplink.getRawPayload());
+                LOG.info("Received noise message from {}: {}", devEui, noiseMessage);
+                executor.execute(() -> processNoiseMessage(devEui, noiseMessage));
+                break;
+            default:
+                LOG.warn("Unhandled message on port {}", uplink.getPort());
+            }
+        } catch (NoiseParseException e) {
+            LOG.warn("Could not parse incoming data from TTN: {}", e.getMessage());
+        } catch (Throwable e) {
+            LOG.error("Caught unhandled throwable", e);
+        }
+    }
+
+    private void processNoiseMessage(String deviceEui, NoiseMessage noiseMessage) {
+        // TODO, e.g. calculate A-norm, send to sensor.community
     }
 
 }
