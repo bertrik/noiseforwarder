@@ -1,25 +1,31 @@
 package nl.bertriksikken.noiseforwarder.noise;
 
-public class NoiseMessage {
+import java.util.Arrays;
+import java.util.Locale;
+
+/**
+ * Decoded representation of TTN noise message.
+ */
+public final class NoiseMessage {
 
     private static final int NUM_OCTAVES = 9;
     private double[] la;
     private double[] lc;
     private double[] lz;
     private double[] spectrum = new double[NUM_OCTAVES];
-    
+
     private NoiseMessage(double[] la, double[] lc, double[] lz, double[] spectrum) {
         this.la = la;
         this.lc = lc;
         this.lz = lz;
         this.spectrum = spectrum;
     }
-    
+
     public static NoiseMessage parse(byte[] data) throws NoiseParseException {
         if (data.length < 27) {
             throw new NoiseParseException("data too small to parse");
         }
-        
+
         double[] la = getMinMaxAvg(data, 0);
         double[] lc = getMinMaxAvg(data, 3);
         double[] lz = getMinMaxAvg(data, 6);
@@ -38,7 +44,7 @@ public class NoiseMessage {
         value[2] = get12bits(data, index++);
         return value;
     }
-    
+
     private static double get12bits(byte[] data, int index) {
         int byteIndex = 3 * index / 2;
         int b0 = data[byteIndex++];
@@ -47,13 +53,13 @@ public class NoiseMessage {
         if ((index % 2) == 0) {
             b0 &= 0xFF;
             b1 &= 0xF0;
-            value = (b0 << 4) | (b1 >> 4); 
+            value = (b0 << 4) | (b1 >> 4);
         } else {
             b0 &= 0x0F;
             b1 &= 0xFF;
             value = (b0 << 8) | b1;
         }
-        return 0.1 * value;
+        return value / 10.0;
     }
 
     public static int getNumOctaves() {
@@ -76,5 +82,10 @@ public class NoiseMessage {
         return spectrum.clone();
     }
 
-}
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "{La=%s,Lc=%s,Lz=%s,spectrum=%s}", Arrays.toString(la), Arrays.toString(lc),
+                Arrays.toString(lz), Arrays.toString(spectrum));
+    }
 
+}

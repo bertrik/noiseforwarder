@@ -14,6 +14,7 @@ public final class NoiseMessageTest {
                 
         NoiseMessage message = NoiseMessage.parse(data);
         
+        System.out.println(message);
         Assert.assertArrayEquals(new double[] {27.4, 56.3, 109.3}, message.getLa(), 0.1);
     }
     
