@@ -3,12 +3,17 @@ package nl.bertriksikken.noiseforwarder.noise;
 import java.util.Arrays;
 import java.util.Locale;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Decoded representation of TTN noise message.
  */
 public final class NoiseMessage {
 
     private static final int NUM_OCTAVES = 9;
+    private static ObjectMapper MAPPER = new ObjectMapper();
+
     private double[] la;
     private double[] lc;
     private double[] lz;
@@ -35,6 +40,15 @@ public final class NoiseMessage {
             spectrum[i] = get12bits(data, index++);
         }
         return new NoiseMessage(la, lc, lz, spectrum);
+    }
+
+    public static NoiseMessage parse(String json) throws NoiseParseException {
+        try {
+            NoiseJson n = MAPPER.readValue(json, NoiseJson.class);
+            return new NoiseMessage(n.la.asArray(), n.lc.asArray(), n.lz.asArray(), n.spectrum);
+        } catch (JsonProcessingException e) {
+            throw new NoiseParseException("Could not deserialize JSON: " + e.getMessage());
+        }
     }
 
     private static double[] getMinMaxAvg(byte[] data, int index) {
