@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public final class NoiseMessage {
 
     private static final int NUM_OCTAVES = 9;
-    private static ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private double[] la;
     private double[] lc;
@@ -74,10 +74,6 @@ public final class NoiseMessage {
             value = (b0 << 8) | b1;
         }
         return value / 10.0;
-    }
-
-    public static int getNumOctaves() {
-        return NUM_OCTAVES;
     }
 
     public double[] getLa() {

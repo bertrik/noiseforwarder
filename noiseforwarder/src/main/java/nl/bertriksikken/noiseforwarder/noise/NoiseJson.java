@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class NoiseJson {
+final class NoiseJson {
 
     @JsonProperty("la")
     MinMaxAvg la = new MinMaxAvg();
