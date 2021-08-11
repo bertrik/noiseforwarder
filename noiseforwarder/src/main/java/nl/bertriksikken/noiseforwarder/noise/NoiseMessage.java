@@ -14,10 +14,10 @@ public final class NoiseMessage {
     private static final int NUM_OCTAVES = 9;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private double[] la;
-    private double[] lc;
-    private double[] lz;
-    private double[] spectrum = new double[NUM_OCTAVES];
+    private final double[] la;
+    private final double[] lc;
+    private final double[] lz;
+    private final double[] spectrum;
 
     private NoiseMessage(double[] la, double[] lc, double[] lz, double[] spectrum) {
         this.la = la;
@@ -26,6 +26,13 @@ public final class NoiseMessage {
         this.spectrum = spectrum;
     }
 
+    /**
+     * Parses a raw byte array into a noise message.
+     * 
+     * @param data the raw data
+     * @return the noise message.
+     * @throws NoiseParseException in case the raw data could not be parsed
+     */
     public static NoiseMessage parse(byte[] data) throws NoiseParseException {
         if (data.length < 27) {
             throw new NoiseParseException("data too small to parse");
@@ -42,6 +49,13 @@ public final class NoiseMessage {
         return new NoiseMessage(la, lc, lz, spectrum);
     }
 
+    /**
+     * Parses a JSON string into a noise message.
+     * 
+     * @param json the JSON string
+     * @return the noise message
+     * @throws NoiseParseException in case the JSON could not be parsed 
+     */
     public static NoiseMessage parse(String json) throws NoiseParseException {
         try {
             NoiseJson n = MAPPER.readValue(json, NoiseJson.class);
