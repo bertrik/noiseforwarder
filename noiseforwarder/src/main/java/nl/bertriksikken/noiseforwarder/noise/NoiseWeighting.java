@@ -8,9 +8,11 @@ import java.util.Map.Entry;
 public final class NoiseWeighting {
     
     private final double NORM_A;
+    private final double NORM_C;
 
     public NoiseWeighting() {
         NORM_A = ra(1000.0);
+        NORM_C = rc(1000.0);
     }
 
     /**
@@ -30,10 +32,31 @@ public final class NoiseWeighting {
     }
     
     /**
+     * Non-normalized A-curve amplitude weighting, @see https://en.wikipedia.org/wiki/A-weighting .
+     * 
+     * @param f frequency (Hz)
+     * @return the non-normalized amplitude weight
+     */
+    private double rc(double f) {
+        double f2 = f * f;
+        double term0 = Math.pow(12194 * f2, 2);
+        double term1 = f2 + Math.pow(20.6, 2);
+        double term2 = f2 + Math.pow(12194, 2);
+        return term0 / (term1 * term2);
+    }
+    
+    /**
      * @return normalized A weight curve (amplitude)
      */
     public INoiseWeighting getAWeighting() {
         return f -> ra(f) / NORM_A;
+    }
+    
+    /**
+     * @return normalized A weight curve (amplitude)
+     */
+    public INoiseWeighting getCWeighting() {
+        return f -> rc(f) / NORM_C;
     }
     
     /**
