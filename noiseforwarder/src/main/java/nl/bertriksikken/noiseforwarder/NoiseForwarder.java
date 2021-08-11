@@ -47,7 +47,7 @@ public final class NoiseForwarder {
         Runtime.getRuntime().addShutdownHook(new Thread(forwarder::stop));
     }
 
-    private NoiseForwarder(NoiseForwarderConfig config) throws IOException {
+    NoiseForwarder(NoiseForwarderConfig config) {
         SensComConfig sensComConfig = config.getSensComConfig();
         sensComUploader = SensComUploader.create(sensComConfig);
 
@@ -78,7 +78,7 @@ public final class NoiseForwarder {
      * @throws MqttException in case of a problem starting MQTT client
      * @throws IOException
      */
-    private void start() throws MqttException, IOException {
+    void start() throws MqttException, IOException {
         LOG.info("Starting noiseforwarder application");
 
         sensComUploader.start();
@@ -92,7 +92,7 @@ public final class NoiseForwarder {
     /**
      * Stops the application.
      */
-    private void stop() {
+    void stop() {
         LOG.info("Stopping noiseforwarder application");
 
         executor.shutdown();
