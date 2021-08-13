@@ -51,6 +51,23 @@ public final class NoiseWeightingTest {
         assertDb(-1.1, curve.getWeight(8000));
     }
     
+    /**
+     * Verifies the C weighting curve.
+     */
+    @Test
+    public void testCWeighting() {
+        NoiseWeighting weighting = new NoiseWeighting();
+        INoiseWeighting curve = weighting.getCWeighting();
+        assertDb(-0.8, curve.getWeight(63));
+        assertDb(-0.2, curve.getWeight(125));
+        assertDb(0.0, curve.getWeight(250));
+        assertDb(0.0, curve.getWeight(500));
+        assertDb(0.0, curve.getWeight(1000));
+        assertDb(-0.2, curve.getWeight(2000));
+        assertDb(-0.8, curve.getWeight(4000));
+        assertDb(-3.0, curve.getWeight(8000));
+    }
+    
     private void assertDb(double expectedDb, double w) {
         double db = 20.0 * Math.log10(w);
         Assert.assertEquals(expectedDb, db, 0.1);

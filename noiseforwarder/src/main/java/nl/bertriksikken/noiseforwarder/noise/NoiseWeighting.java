@@ -39,7 +39,7 @@ public final class NoiseWeighting {
      */
     private double rc(double f) {
         double f2 = f * f;
-        double term0 = Math.pow(12194 * f2, 2);
+        double term0 = Math.pow(12194 * f, 2);
         double term1 = f2 + Math.pow(20.6, 2);
         double term2 = f2 + Math.pow(12194, 2);
         return term0 / (term1 * term2);
