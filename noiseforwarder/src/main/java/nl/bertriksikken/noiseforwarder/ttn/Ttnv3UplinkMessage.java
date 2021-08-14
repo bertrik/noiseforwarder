@@ -20,8 +20,9 @@ public final class Ttnv3UplinkMessage {
         String devId = endDeviceIds.at("/device_id").asText("");
         String appId = endDeviceIds.at("/application_ids/application_id").asText("");
         String devEui = endDeviceIds.at("/dev_eui").asText("");
-        TtnUplinkMessage message = new TtnUplinkMessage(appId, devId, devEui, uplinkMessage.frmPayload,
-                uplinkMessage.decodedPayload, uplinkMessage.fport);
+        String decodedFields = uplinkMessage.decodedPayload != null ? uplinkMessage.decodedPayload.toString() : "";
+        TtnUplinkMessage message = new TtnUplinkMessage(appId, devId, devEui, uplinkMessage.frmPayload, decodedFields,
+                uplinkMessage.fport);
         int sf = uplinkMessage.settings.at("/data_rate/lora/spreading_factor").asInt();
         double rssi = uplinkMessage.rxMetadata.stream().mapToDouble(m -> m.at("/rssi").asDouble()).max()
                 .orElse(Double.NaN);
@@ -43,7 +44,7 @@ public final class Ttnv3UplinkMessage {
         private byte[] frmPayload = new byte[0];
 
         @JsonProperty("decoded_payload")
-        private String decodedPayload = "";
+        private JsonNode decodedPayload;
 
         @JsonProperty("rx_metadata")
         private List<JsonNode> rxMetadata = new ArrayList<>();

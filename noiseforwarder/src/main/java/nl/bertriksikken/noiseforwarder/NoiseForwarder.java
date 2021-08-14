@@ -112,7 +112,7 @@ public final class NoiseForwarder {
             switch (uplink.getPort()) {
             case 21:
                 String devEui = uplink.getDevEui();
-                NoiseMessage noiseMessage = NoiseMessage.parse(uplink.getDecodedPayload());
+                NoiseMessage noiseMessage = NoiseMessage.parse(uplink.getDecodedFields());
                 LOG.info("Received noise message from {}: {}", devEui, noiseMessage);
                 executor.execute(() -> processNoiseMessage(devEui, noiseMessage));
                 break;
