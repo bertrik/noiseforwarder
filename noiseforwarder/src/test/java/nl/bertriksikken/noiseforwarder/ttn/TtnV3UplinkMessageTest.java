@@ -49,8 +49,7 @@ public final class TtnV3UplinkMessageTest {
         TtnUplinkMessage message = ttnv3UplinkMessage.toTtnUplinkMessage();
         String decodedFields = message.getDecodedFields();
         JsonNode node = mapper.readTree(decodedFields);
-        Assert.assertEquals(57, node.at("/relative_humidity_4").asInt());
-        
+        Assert.assertEquals(35.5, node.at("/la/avg").asDouble(), 0.1);
     }
 
 }

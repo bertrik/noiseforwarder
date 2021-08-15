@@ -1,6 +1,5 @@
 package nl.bertriksikken.noiseforwarder.noise;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,42 +10,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public final class NoiseMessage {
 
-    private static final int NUM_OCTAVES = 9;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final double[] la;
-    private final double[] lc;
-    private final double[] lz;
-    private final double[] spectrum;
+    private final NoiseStats la;
+    private final NoiseStats lc;
+    private final NoiseStats lz;
 
-    private NoiseMessage(double[] la, double[] lc, double[] lz, double[] spectrum) {
+    private NoiseMessage(NoiseStats la, NoiseStats lc, NoiseStats lz) {
         this.la = la;
         this.lc = lc;
         this.lz = lz;
-        this.spectrum = spectrum;
-    }
-
-    /**
-     * Parses a raw byte array into a noise message.
-     * 
-     * @param data the raw data
-     * @return the noise message.
-     * @throws NoiseParseException in case the raw data could not be parsed
-     */
-    public static NoiseMessage parse(byte[] data) throws NoiseParseException {
-        if (data.length < 27) {
-            throw new NoiseParseException("data too small to parse");
-        }
-
-        double[] la = getMinMaxAvg(data, 0);
-        double[] lc = getMinMaxAvg(data, 3);
-        double[] lz = getMinMaxAvg(data, 6);
-        int index = 9;
-        double[] spectrum = new double[NUM_OCTAVES];
-        for (int i = 0; i < NUM_OCTAVES; i++) {
-            spectrum[i] = get12bits(data, index++);
-        }
-        return new NoiseMessage(la, lc, lz, spectrum);
     }
 
     /**
@@ -59,21 +32,16 @@ public final class NoiseMessage {
     public static NoiseMessage parse(String json) throws NoiseParseException {
         try {
             NoiseJson n = MAPPER.readValue(json, NoiseJson.class);
-            return new NoiseMessage(n.la.asArray(), n.lc.asArray(), n.lz.asArray(), n.spectrum);
+            NoiseStats la = new NoiseStats(n.la.min, n.la.max, n.la.avg, n.la.spectrum);
+            NoiseStats lc = new NoiseStats(n.lc.min, n.lc.max, n.lc.avg, n.lc.spectrum);
+            NoiseStats lz = new NoiseStats(n.lz.min, n.lz.max, n.lz.avg, n.lz.spectrum);
+            return new NoiseMessage(la, lc, lz);
         } catch (JsonProcessingException e) {
             throw new NoiseParseException("Could not deserialize JSON: " + e.getMessage());
         }
     }
 
-    private static double[] getMinMaxAvg(byte[] data, int index) {
-        double[] value = new double[3];
-        value[0] = get12bits(data, index++);
-        value[1] = get12bits(data, index++);
-        value[2] = get12bits(data, index++);
-        return value;
-    }
-
-    private static double get12bits(byte[] data, int index) {
+    public static double get12bits(byte[] data, int index) {
         int byteIndex = 3 * index / 2;
         int b0 = data[byteIndex++];
         int b1 = data[byteIndex];
@@ -90,26 +58,21 @@ public final class NoiseMessage {
         return value / 10.0;
     }
 
-    public double[] getLa() {
-        return la.clone();
+    public NoiseStats getLa() {
+        return la;
     }
 
-    public double[] getLc() {
-        return lc.clone();
+    public NoiseStats getLc() {
+        return lc;
     }
 
-    public double[] getLz() {
-        return lz.clone();
-    }
-
-    public double[] getSpectrum() {
-        return spectrum.clone();
+    public NoiseStats getLz() {
+        return lz;
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "{La=%s,Lc=%s,Lz=%s,spectrum=%s}", Arrays.toString(la), Arrays.toString(lc),
-                Arrays.toString(lz), Arrays.toString(spectrum));
+        return String.format(Locale.ROOT, "{La=%s,Lc=%s,Lz=%s}", la, lc, lz);
     }
 
 }

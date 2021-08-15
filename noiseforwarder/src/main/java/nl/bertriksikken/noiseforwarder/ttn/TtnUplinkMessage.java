@@ -20,7 +20,7 @@ public final class TtnUplinkMessage {
     private double snr = Double.NaN;
     private int sf = 0;
 
-    public TtnUplinkMessage(String appId, String devId, String devEui, byte[] rawPayload, String decodedFields,
+    TtnUplinkMessage(String appId, String devId, String devEui, byte[] rawPayload, String decodedFields,
             int port) {
         this.appId = appId;
         this.devId = devId;

@@ -7,18 +7,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 final class NoiseJson {
 
     @JsonProperty("la")
-    MinMaxAvg la = new MinMaxAvg();
+    NoiseStatsJson la = new NoiseStatsJson();
 
     @JsonProperty("lc")
-    MinMaxAvg lc = new MinMaxAvg();
+    NoiseStatsJson lc = new NoiseStatsJson();
 
     @JsonProperty("lz")
-    MinMaxAvg lz = new MinMaxAvg();
+    NoiseStatsJson lz = new NoiseStatsJson();
 
-    @JsonProperty("spectrum")
-    double[] spectrum = new double[0];
-    
-    static final class MinMaxAvg {
+    static final class NoiseStatsJson {
 
         @JsonProperty("min")
         double min = 0.0;
@@ -26,10 +23,8 @@ final class NoiseJson {
         double max = 0.0;
         @JsonProperty("avg")
         double avg = 0.0;
-
-        double[] asArray() {
-            return new double[] { min, max, avg };
-        }
+        @JsonProperty("spectrum")
+        double[] spectrum = new double[0];
     }
 
 }
