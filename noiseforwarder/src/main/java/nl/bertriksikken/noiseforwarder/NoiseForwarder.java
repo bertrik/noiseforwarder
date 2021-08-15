@@ -20,6 +20,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import nl.bertriksikken.noiseforwarder.noise.NoiseMessage;
 import nl.bertriksikken.noiseforwarder.noise.NoiseParseException;
 import nl.bertriksikken.noiseforwarder.senscom.SensComConfig;
+import nl.bertriksikken.noiseforwarder.senscom.SensComMessage;
 import nl.bertriksikken.noiseforwarder.senscom.SensComUploader;
 import nl.bertriksikken.noiseforwarder.ttn.MqttListener;
 import nl.bertriksikken.noiseforwarder.ttn.TtnAppConfig;
@@ -127,7 +128,12 @@ public final class NoiseForwarder {
     }
 
     private void processNoiseMessage(String deviceEui, NoiseMessage noiseMessage) {
-        // TODO, e.g. calculate A-norm, send to sensor.community
+        String sensorId = "esp32-" + Long.parseLong(deviceEui, 16);
+        SensComMessage message = new SensComMessage();
+        message.addItem("noise_LAeq", noiseMessage.getLa().getAvg());
+        message.addItem("noise_LA_min", noiseMessage.getLa().getMin());
+        message.addItem("noise_LA_,ax", noiseMessage.getLa().getMax());
+        sensComUploader.scheduleUpload(sensorId, message);
     }
 
 }
