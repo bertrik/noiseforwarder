@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class TtnAppConfig {
     @JsonProperty("name")
-    private String name = "noise";
+    private String name = "ttn-soundkit";
 
     @JsonProperty("key")
     private String key = "NNSXS.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.YYYYYY";
