@@ -132,7 +132,7 @@ public final class NoiseForwarder {
         SensComMessage message = new SensComMessage();
         message.addItem("noise_LAeq", noiseMessage.getLa().getAvg());
         message.addItem("noise_LA_min", noiseMessage.getLa().getMin());
-        message.addItem("noise_LA_,ax", noiseMessage.getLa().getMax());
+        message.addItem("noise_LA_max", noiseMessage.getLa().getMax());
         sensComUploader.scheduleUpload(sensorId, message);
     }
 
