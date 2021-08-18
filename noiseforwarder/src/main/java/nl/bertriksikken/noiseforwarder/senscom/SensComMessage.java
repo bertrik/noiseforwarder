@@ -32,7 +32,7 @@ public final class SensComMessage {
     }
 
     public void addItem(String name, Double value) {
-        items.add(new SensComItem(name, value));
+        addItem(name, String.format(Locale.ROOT, "%.1f", value));
     }
 
     public List<SensComItem> getItems() {
@@ -44,4 +44,28 @@ public final class SensComMessage {
         return String.format(Locale.ROOT, "{softwareVersion=%s,items=%s}", softwareVersion, items);
     }
 
+    private static final class SensComItem {
+
+        @JsonProperty("value_type")
+        private String name;
+        @JsonProperty("value")
+        private String value;
+
+        /**
+         * Constructor.
+         * 
+         * @param name  the item name
+         * @param value the item value
+         */
+        SensComItem(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(Locale.ROOT, "{name=%s,value=%s}", name, value);
+        }
+
+    }
 }
