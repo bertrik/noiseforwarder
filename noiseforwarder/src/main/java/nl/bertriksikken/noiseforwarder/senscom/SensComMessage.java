@@ -1,7 +1,6 @@
 package nl.bertriksikken.noiseforwarder.senscom;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,10 +32,6 @@ public final class SensComMessage {
 
     public void addItem(String name, Double value) {
         addItem(name, String.format(Locale.ROOT, "%.1f", value));
-    }
-
-    public List<SensComItem> getItems() {
-        return Collections.unmodifiableList(items);
     }
 
     @Override
