@@ -110,8 +110,10 @@ public final class NoiseForwarder {
 
     private void messageReceived(TtnUplinkMessage uplink) {
         try {
+            LOG.info("Message received: {}", uplink);
             switch (uplink.getPort()) {
             case 21:
+            case 22:
                 String devEui = uplink.getDevEui();
                 NoiseMessage noiseMessage = NoiseMessage.parse(uplink.getDecodedFields());
                 LOG.info("Received noise message from {}: {}", devEui, noiseMessage);
@@ -119,6 +121,7 @@ public final class NoiseForwarder {
                 break;
             default:
                 LOG.warn("Unhandled message on port {}", uplink.getPort());
+                break;
             }
         } catch (NoiseParseException e) {
             LOG.warn("Could not parse incoming data from TTN: {}", e.getMessage());
