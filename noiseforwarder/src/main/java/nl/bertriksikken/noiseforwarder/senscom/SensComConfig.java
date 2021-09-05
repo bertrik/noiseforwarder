@@ -8,7 +8,7 @@ public final class SensComConfig {
     private String url = "https://api.sensor.community";
 
     @JsonProperty("timeout")
-    private int timeout = 20;
+    private int timeout = 30;
 
     public String getUrl() {
         return url;
