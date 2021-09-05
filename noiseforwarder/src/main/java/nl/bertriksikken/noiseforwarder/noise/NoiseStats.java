@@ -1,7 +1,8 @@
 package nl.bertriksikken.noiseforwarder.noise;
 
-import java.util.Arrays;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 public final class NoiseStats {
 
@@ -35,8 +36,9 @@ public final class NoiseStats {
 
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "{min=%.1f,max=%.1f,avg=%.1f,spectrum=%s}", min, max, avg,
-                Arrays.toString(spectrum));
+        String formattedSpectrum = DoubleStream.of(spectrum).mapToObj(v -> String.format(Locale.ROOT, "%.1f", v))
+                .collect(Collectors.joining(",", "[", "]"));
+        return String.format(Locale.ROOT, "{min=%.1f,max=%.1f,avg=%.1f,spectrum=%s}", min, max, avg, formattedSpectrum);
     }
 
 }
